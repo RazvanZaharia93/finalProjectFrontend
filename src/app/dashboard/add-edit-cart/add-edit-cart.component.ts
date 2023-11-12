@@ -21,4 +21,9 @@ export class AddEditCartComponent {
   public onRemove(item: Item):void{
     this.cartService.removeFromCart(item);
   }
+
+  public onBuy(){
+    //this.cartService.createCart()
+    this.cartService.createCartWithDto();
+  }
 }

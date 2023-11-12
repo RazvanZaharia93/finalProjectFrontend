@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {Item} from "../models/Item";
+import {UserService} from "../user/user.service";
+import {HttpClient} from "@angular/common/http";
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
   private cartObservable = new BehaviorSubject<Array<Item>>([]);
-  constructor() { }
+  constructor(private userService:UserService, private httpClient:HttpClient) { }
 
 public addToCart(item: Item): void{
     let items = this.cartObservable.getValue();
@@ -29,4 +32,30 @@ public removeFromCart(item:Item):void{
 public getCart(){
     return this.cartObservable.asObservable();
 }
+
+public createCart(){
+    let body = {
+      user:this.userService.getUser(),
+      items:this.cartObservable.getValue()
+    }
+
+    this.httpClient.post(`${environment.apiUrl}/carts/`, body).subscribe((response:any)=>{console.log(response)})
+}
+
+  public createCartWithDto(){
+    let body = {
+      userId:this.userService.getUser().id,
+      items:this.cartObservable.getValue()
+    }
+
+    this.httpClient.post(`${environment.apiUrl}/carts/create-dto`, body).subscribe((response:any)=>{console.log(response)})
+  }
+
+  public deleteCart(id:string){
+    this.httpClient.delete(`${environment.apiUrl}/carts/${id}`).subscribe((response:any)=>{console.log(response)})
+  }
+
+  public readCarts(){
+    return this.httpClient.get(`${environment.apiUrl}/carts/`);
+  }
 }
